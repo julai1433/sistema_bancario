@@ -166,7 +166,3 @@ Ver `docs/coffman_analysis.md` para:
 
 Proyecto desarrollado para el curso de Tecnologías de Programación
 Maestría - Universidad [Nombre]
-
----
-
-**Generado con Claude Code** 🤖
