@@ -1,0 +1,21 @@
+{
+  "_comment_accounts": "Define initial accounts with IDs and balances",
+  "accounts": [
+    {"id": 1, "initial_balance": 1000},
+    {"id": 2, "initial_balance": 1000}
+  ],
+  "_comment_transfers": "List of transfers to execute concurrently. Note: opposing transfers (A→B and B→A) will trigger deadlock in Phase 1",
+  "transfers": [
+    {"from": 1, "to": 2, "amount": 100},
+    {"from": 2, "to": 1, "amount": 50}
+  ],
+  "_comment_simulation": "Simulation parameters",
+  "simulation": {
+    "thread_delay_seconds": 0.01,
+    "_comment_delay": "Artificial delay between lock acquisitions to increase deadlock probability",
+    "deadlock_timeout_seconds": 10,
+    "_comment_timeout": "Max seconds to wait before declaring a deadlock",
+    "verbose_logging": true,
+    "_comment_verbose": "Enable detailed logging of lock operations"
+  }
+}

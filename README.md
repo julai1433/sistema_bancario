@@ -1,52 +1,172 @@
-# sistema_bancario
+# Sistema Bancario - Simulación de Deadlock Concurrente
 
 Actividad 4.1: Simulación de un Sistema Bancario Concurrente
-Due November 14, 2025 9:59 PM
-•
-Closes November 21, 2025 9:59 PM
-Actividad de Aprendizaje
-•
-Tema 4 - Programación Concurrente
-Instructions
-Descripción
+**Due:** November 14, 2025 9:59 PM
+**Tema:** Programación Concurrente
 
-Se implementará un sistema bancario simplificado que maneja Cuentas y Transferencias. El sistema consiste en un Banco que gestiona un conjunto de N cuentas bancarias. Múltiples hilos (simulando "Transacciones" o "Cajeros") ejecutarán transferencias de dinero entre dos cuentas de forma concurrente.
+## Descripción
 
-Una transferencia transferir(Cuenta A, Cuenta B, monto) debe ser atómica: debe restar el monto de la Cuenta A y sumarlo a la Cuenta B sin que ninguna otra transacción interfiera en medio. Para lograr esto, una transacción debe adquirir el lock de ambas cuentas (la de origen y la de destino) antes de proceder.
+Sistema bancario simplificado que demuestra la ocurrencia y prevención de **deadlocks** en sistemas concurrentes. El sistema implementa dos fases:
 
-El Desafío (El Deadlock): El problema surge cuando dos hilos intentan realizar transferencias opuestas simultáneamente:
+- **Fase 1 (Deadlock-Prone):** Adquisición naive de locks que puede causar deadlock
+- **Fase 2 (Deadlock-Free):** Adquisición ordenada de locks que previene deadlock
 
+### El Desafío del Deadlock
+
+Cuando dos hilos intentan realizar transferencias opuestas simultáneamente:
+
+```
 Hilo 1: transferir(Cuenta X, Cuenta Y, 100)
 Hilo 2: transferir(Cuenta Y, Cuenta X, 50)
-El Hilo 1 podría bloquear la Cuenta X y luego intentar bloquear la Cuenta Y. Al mismo tiempo, el Hilo 2 podría bloquear la Cuenta Y e intentar bloquear la Cuenta X. Esto crea una espera circular, resultando en un interbloqueo (Deadlock)donde el programa se congela.
 
+→ Hilo 1 bloquea X, espera Y
+→ Hilo 2 bloquea Y, espera X
+→ DEADLOCK (espera circular)
+```
 
+## Características
 
-Objetivo General
+- ✅ Sistema bancario thread-safe con cuentas y transferencias
+- ✅ Fase 1: Implementación deadlock-prone (con trigger de `sleep`)
+- ✅ Fase 2: Implementación deadlock-free (lock ordering)
+- ✅ Menú interactivo para ejecutar simulaciones
+- ✅ Logging detallado con output colorizado
+- ✅ Configuración editable (JSON)
+- ✅ Tests unitarios e integración (pytest)
+- ✅ Métricas de simulación
 
-Diseñar e implementar un sistema concurrente robusto que maneje múltiples recursos bloqueables, demostrando la capacidad de provocar, identificar y prevenir interbloqueos (Deadlocks) mediante la aplicación de protocolos de adquisición de recursos.
+## Estructura del Proyecto
 
-Objetivos Específicos:
+```
+sistema_bancario/
+├── src/
+│   ├── models/          # Account, Transaction
+│   ├── banks/           # Bank, Phase1Bank, Phase2Bank
+│   ├── simulation/      # Simulator, Metrics
+│   ├── ui/              # Interactive Menu, Colors
+│   ├── utils/           # Logger, ConfigLoader
+│   └── main.py          # Entry point
+├── tests/               # Unit & integration tests
+├── config/              # Configuration files
+├── logs/                # Generated logs
+└── requirements.txt
+```
 
-Implementar la exclusión mutua para un recurso individual (Cuenta).
-Diseñar una transacción que requiera la adquisición de múltiples locks.
-Provocar deliberadamente un interbloqueo (Fase 1) y demostrar que se entiende por qué ocurre, relacionándolo con las 4 condiciones de Coffman.
-Refactorizar el diseño (Fase 2) para prevenir el interbloqueo, rompiendo una de las 4 condiciones (específicamente, la espera circular).
-Entregables
+## Instalación
 
-Código Fuente (Python o Java):
-Fase 1 (Versión "Ingenua" / Rota): La implementación que adquiere los locks en un orden arbitrario (ej. lock(A) y luego lock(B)) y que es susceptible a deadlocks. El código debe incluir un "gatillo" (ej. un sleepcorto entre la adquisición de los dos locks) para hacer que el deadlock sea más probable y reproducible.
-Fase 2 (Versión "Corregida" / Prevención): La implementación robusta que previene el deadlock.
-Video-Demostración (Formato MP4, máx. 5 min):
-Fase 1: Ejecutar el código y demostrar el congelamiento del programa. El estudiante debe narrar, viendo la salida de la consola, "Como ven, el Hilo 1 bloqueó A y espera por B, y el Hilo 2 bloqueó B y espera por A. El programa está muerto".
-Fase 2: Ejecutar el código corregido (con las mismas transferencias opuestas y concurrentes) y demostrar que la simulación se completa exitosamente sin congelarse.
-Reporte Técnico:
-Análisis del Deadlock:
-Explicar cómo la implementación de la Fase 1 cumple las 4 condiciones de Coffman (Exclusión Mutua, Retención y Espera, No Apropiación, Espera Circular).
-Incluir un gráfico de asignación de recursos (simple, hecho en draw.io o similar) que modele el estado de deadlock de su programa.
-Diseño de la Prevención:
-Describir la estrategia de prevención implementada. (La solución canónica es romper la espera circular imponiendo un orden global en la adquisición de locks. Por ejemplo, siempre bloquear primero la cuenta con el ID numérico más bajo).
-Justificar por qué esta estrategia rompe la condición de espera circular y garantiza que el deadlock es imposible.
+### 1. Crear entorno virtual
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # En Windows: venv\Scripts\activate
+```
+
+### 2. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+## Uso
+
+### Ejecutar el programa interactivo
+
+```bash
+python -m src.main
+```
+
+### Menú Principal
+
+```
+1. Run Phase 1 (Deadlock-Prone)
+2. Run Phase 2 (Deadlock-Free)
+3. Run Both Phases (Comparison)
+4. Show Current Configuration
+5. Load Configuration File
+6. Exit
+```
+
+### Ejecutar tests
+
+```bash
+# Todos los tests
+pytest
+
+# Con coverage
+pytest --cov=src --cov-report=html
+
+# Solo unit tests
+pytest tests/unit/
+
+# Verbose
+pytest -v
+```
+
+## Configuración
+
+Edita `config/config.json` para modificar:
+
+- **accounts**: Cantidad y saldo inicial de cuentas
+- **transfers**: Transferencias a ejecutar concurrentemente
+- **simulation.thread_delay_seconds**: Delay entre locks (Phase 1)
+- **simulation.deadlock_timeout_seconds**: Timeout para detectar deadlock
+- **simulation.verbose_logging**: Nivel de detalle del logging
+
+## Análisis del Deadlock (Coffman Conditions)
+
+### Fase 1 cumple las 4 condiciones:
+
+1. **Exclusión Mutua:** Los locks son mutuamente exclusivos
+2. **Hold and Wait:** Un hilo retiene un lock mientras espera otro
+3. **No Preemption:** Los locks no se pueden quitar forzosamente
+4. **Circular Wait:** Hilo-1 espera recurso de Hilo-2 y viceversa
+
+### Fase 2 rompe la Circular Wait:
+
+- **Estrategia:** Adquisición de locks en **orden global** (por ID ascendente)
+- **Resultado:** Sin espera circular → Sin deadlock
+
+## Logs
+
+Los logs se guardan automáticamente en `logs/simulation_YYYYMMDD_HHMMSS.log`
+
+Ejemplo de output:
+
+```
+[Thread-1] 🔵 INFO Starting transfer: Account-1 → Account-2 ($100.00)
+[Thread-1] 🔒 Acquired lock on Account-1
+[Thread-1] ⏳ Waiting for lock on Account-2...
+[Thread-1] 🔒 Acquired lock on Account-2
+[Thread-1] 🟢 SUCCESS Transfer completed
+```
+
+## Para el Reporte Técnico
+
+Ver `docs/coffman_analysis.md` para:
+- Análisis detallado de las condiciones de Coffman
+- Diagramas de asignación de recursos
+- Justificación de la estrategia de prevención
+
+## Objetivos del Proyecto
+
+✅ Implementar exclusión mutua para recursos individuales (Account)
+✅ Diseñar transacciones que requieren múltiples locks
+✅ Provocar deliberadamente un deadlock (Phase 1)
+✅ Prevenir el deadlock rompiendo circular wait (Phase 2)
+
+## Tecnologías
+
+- **Python 3.10+**
+- **threading:** Concurrencia con locks
+- **pytest:** Testing framework
+- **colorama:** Output colorizado
+- **Type hints:** Código type-safe
+
+## Autores
+
+Proyecto desarrollado para el curso de Tecnologías de Programación
+Maestría - Universidad [Nombre]
 
 ---
-*This project is being initialized with Claude Code.*
+
+**Generado con Claude Code** 🤖
