@@ -3,35 +3,13 @@
     {"id": 1, "initial_balance": 1000},
     {"id": 2, "initial_balance": 1000},
     {"id": 3, "initial_balance": 1000},
-    {"id": 4, "initial_balance": 1000},
-    {"id": 5, "initial_balance": 1000},
-    {"id": 6, "initial_balance": 1000},
-    {"id": 7, "initial_balance": 1000},
-    {"id": 8, "initial_balance": 1000},
-    {"id": 9, "initial_balance": 1000},
-    {"id": 10, "initial_balance": 1000}
+    {"id": 4, "initial_balance": 1000}
   ],
   "transfers": [
     {"from": 1, "to": 2, "amount": 100},
     {"from": 2, "to": 1, "amount": 50},
     {"from": 3, "to": 4, "amount": 75},
-    {"from": 4, "to": 3, "amount": 60},
-    {"from": 5, "to": 6, "amount": 200},
-    {"from": 6, "to": 5, "amount": 150},
-    {"from": 7, "to": 8, "amount": 80},
-    {"from": 8, "to": 7, "amount": 90},
-    {"from": 9, "to": 10, "amount": 120},
-    {"from": 10, "to": 9, "amount": 110},
-    {"from": 1, "to": 5, "amount": 50},
-    {"from": 5, "to": 1, "amount": 30},
-    {"from": 2, "to": 6, "amount": 40},
-    {"from": 6, "to": 2, "amount": 35},
-    {"from": 3, "to": 7, "amount": 65},
-    {"from": 7, "to": 3, "amount": 55},
-    {"from": 4, "to": 8, "amount": 45},
-    {"from": 8, "to": 4, "amount": 70},
-    {"from": 9, "to": 1, "amount": 85},
-    {"from": 10, "to": 2, "amount": 95}
+    {"from": 4, "to": 3, "amount": 60}
   ],
   "simulation": {
     "thread_delay_seconds": 0.01,
