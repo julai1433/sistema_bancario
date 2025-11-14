@@ -165,4 +165,4 @@ Ver `docs/coffman_analysis.md` para:
 ## Autores
 
 Proyecto desarrollado para el curso de Tecnologías de Programación
-Maestría - Universidad [Nombre]
+Maestría en Sistemas Computacionales - Instituto Tecnológico de Morelia
