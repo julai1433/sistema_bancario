@@ -1,4 +1,5 @@
 """Phase 2 Bank implementation - DEADLOCK FREE (Ordered locking)."""
+import time
 from typing import List, Tuple
 
 from src.banks.base_bank import Bank
@@ -36,13 +37,15 @@ class Phase2Bank(Bank):
         3. No Preemption: Still present (locks not forcibly taken)
     """
 
-    def __init__(self, accounts: List[Account]) -> None:
+    def __init__(self, accounts: List[Account], thread_delay: float = 0.01) -> None:
         """Initialize Phase2Bank.
 
         Args:
             accounts: List of Account objects
+            thread_delay: Delay between lock acquisitions (same as Phase 1 for comparison)
         """
         super().__init__(accounts)
+        self.thread_delay = thread_delay
 
     def transfer(
         self, from_account_id: int, to_account_id: int, amount: float
@@ -90,6 +93,15 @@ class Phase2Bank(Bank):
         first_account.lock.acquire()
         try:
             logger.debug(f"✓ Acquired lock on {first_account}")
+
+            # SAME DELAY as Phase 1 to prove deadlock immunity
+            # Even with this delay, the global ordering prevents deadlock
+            if self.thread_delay > 0:
+                logger.debug(
+                    f"Sleeping {self.thread_delay}s (same delay as Phase 1, "
+                    f"but no deadlock due to lock ordering)"
+                )
+                time.sleep(self.thread_delay)
 
             logger.debug(f"Attempting to acquire lock on {second_account}")
             second_account.lock.acquire()
