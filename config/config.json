@@ -1,15 +1,11 @@
 {
   "accounts": [
     {"id": 1, "initial_balance": 1000},
-    {"id": 2, "initial_balance": 1000},
-    {"id": 3, "initial_balance": 1000},
-    {"id": 4, "initial_balance": 1000}
+    {"id": 2, "initial_balance": 1000}
   ],
   "transfers": [
     {"from": 1, "to": 2, "amount": 100},
-    {"from": 2, "to": 1, "amount": 50},
-    {"from": 3, "to": 4, "amount": 75},
-    {"from": 4, "to": 3, "amount": 60}
+    {"from": 2, "to": 1, "amount": 50}
   ],
   "simulation": {
     "thread_delay_seconds": 0.01,
