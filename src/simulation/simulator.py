@@ -165,14 +165,54 @@ class TransactionSimulator:
             with self.transactions_lock:
                 self.transactions.append(transaction)
 
-        # Execute transfers in parallel
+        # Execute transfers in parallel with timeout enforcement
         max_workers = min(len(self.transfers_data), 20)  # Limit concurrency
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
-                executor.submit(transfer_task, transfer)
-                for transfer in self.transfers_data
-            ]
 
-            # Wait for all to complete or timeout
-            for future in futures:
-                future.result(timeout=self.timeout_seconds)
+        # Use daemon threads so they don't prevent program exit
+        executor = ThreadPoolExecutor(max_workers=max_workers)
+
+        futures = [
+            executor.submit(transfer_task, transfer)
+            for transfer in self.transfers_data
+        ]
+
+        # Wait for all to complete or timeout
+        from concurrent.futures import wait, ALL_COMPLETED
+
+        done, not_done = wait(
+            futures,
+            timeout=self.timeout_seconds,
+            return_when=ALL_COMPLETED
+        )
+
+        # If there are incomplete futures after timeout, it's a deadlock
+        if not_done:
+            logger.warning(
+                f"Deadlock detected: {len(not_done)} transfers still pending "
+                f"after {self.timeout_seconds}s timeout"
+            )
+
+            # Force shutdown - Python cannot kill threads blocked on locks
+            # So we must exit the process entirely
+            executor.shutdown(wait=False, cancel_futures=True)
+
+            # Log final message before exit
+            logger.error(
+                "\nDeadlocked threads cannot be killed in Python. "
+                "Exiting process to demonstrate deadlock.\n"
+                "This is expected behavior for Phase 1.\n"
+            )
+
+            # Force process exit - only way to handle deadlocked threads
+            import sys
+            import os
+
+            # Flush logs before exit
+            import logging
+            logging.shutdown()
+
+            # Exit with special code to indicate deadlock
+            os._exit(2)  # Exit code 2 = deadlock detected
+
+        # Normal shutdown if all completed
+        executor.shutdown(wait=True)
