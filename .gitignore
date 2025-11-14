@@ -45,6 +45,3 @@ logs/*.txt
 # OS
 .DS_Store
 Thumbs.db
-
-# Claude Code (comment out if you want to commit .claude/ config)
-.claude/
