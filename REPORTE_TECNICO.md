@@ -270,22 +270,48 @@ graph TD
 | 3. No Apropiación | ✅ Cumple | ✅ Cumple | Sin cambio |
 | 4. Espera Circular | ✅ **Cumple** | ❌ **ROTA** | **Deadlock eliminado** |
 
-#### ¿Por qué no hay espera circular?
+#### ¿Por qué no puede haber espera circular?
 
-**Teorema:** Si todos los procesos adquieren recursos en el mismo orden parcial, no puede existir un ciclo en el grafo de asignación de recursos.
+**Concepto clave:** El ordenamiento global impone una jerarquía estricta en la adquisición de locks.
 
-**Demostración por contradicción:**
-1. Supongamos que existe un ciclo: P₁ → R₁ → P₂ → R₂ → ... → Pₙ → Rₙ → P₁
-2. Esto significa que:
-   - P₁ posee R₁ y espera R₂
-   - P₂ posee R₂ y espera R₃
-   - ...
-   - Pₙ posee Rₙ y espera R₁
+**Explicación con ejemplo concreto:**
 
-3. Por el ordenamiento global: ID(R₁) < ID(R₂) < ... < ID(Rₙ)
-4. Pero también: ID(Rₙ) < ID(R₁) (porque Pₙ espera R₁)
-5. Contradicción: ID(R₁) < ... < ID(Rₙ) < ID(R₁)
-6. Por lo tanto, **no puede existir un ciclo** ∎
+En nuestro sistema con Account-1 y Account-2:
+- **Regla obligatoria:** SIEMPRE adquirir primero el lock de la cuenta con ID menor
+
+Veamos qué pasa cuando dos hilos intentan crear un ciclo:
+
+```
+Intento de crear ciclo (IMPOSIBLE):
+  Hilo-A posee Account-1 y quiere Account-2
+  Hilo-B posee Account-2 y quiere Account-1  ← ¡Esto NO puede ocurrir!
+```
+
+**¿Por qué es imposible?**
+
+1. **Hilo-A** necesita transferir entre Account-1 y Account-2:
+   - Ordena: (1, 2) → Adquiere Account-1 primero ✓
+   - Luego adquiere Account-2 ✓
+
+2. **Hilo-B** necesita transferir entre Account-2 y Account-1:
+   - Ordena: (1, 2) → **¡Mismo orden!** Adquiere Account-1 primero
+   - No puede adquirir Account-2 primero (violaria la regla)
+
+3. **Resultado:**
+   - Ambos hilos intentan adquirir Account-1 primero
+   - El que llegue primero obtiene Account-1, luego Account-2
+   - El otro espera a que se libere Account-1
+   - **No hay espera mutua** porque ambos necesitan el mismo recurso inicial
+
+#### Prueba general:
+
+**Teorema:** Con ordenamiento global, es imposible que:
+- Proceso P₁ posea recurso de ID menor y espere recurso de ID mayor
+- Proceso P₂ posea recurso de ID mayor y espere recurso de ID menor (al mismo tiempo)
+
+**¿Por qué?** Porque P₂ habría violado la regla al adquirir el recurso de ID mayor primero.
+
+**Conclusión:** Sin espera circular bidireccional → Sin deadlock
 
 ### 3.5 Salida del Programa (Fase 2)
 
@@ -337,22 +363,6 @@ Deadlocked:           NO
 | Balance final conservado | N/A | Sí ($2,000) |
 | Tiempo de ejecución | 10.00s (timeout) | 0.03s |
 
-### 4.3 Observaciones Clave
-
-1. **Mismo delay, diferentes resultados:**
-   - Ambas fases usan `sleep(0.01)` entre adquisiciones de locks
-   - Fase 1: Deadlock garantizado
-   - Fase 2: Ejecución exitosa
-   - **Conclusión:** El problema no es el delay, sino el orden de adquisición
-
-2. **Prevención vs Detección:**
-   - Fase 1 usa **detección** (timeout + forzar salida)
-   - Fase 2 usa **prevención** (imposibilidad de deadlock)
-   - **Conclusión:** Prevención es superior (sin overhead de detección)
-
-3. **Trade-offs:**
-   - Fase 2 puede reducir concurrencia (serialización parcial)
-   - En este experimento: overhead es despreciable (0.03s vs 0.02s sin delay)
 
 ---
 
