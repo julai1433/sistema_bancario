@@ -32,12 +32,10 @@ class InteractiveMenu:
             elif choice == "2":
                 self.run_phase2()
             elif choice == "3":
-                self.run_both_phases()
-            elif choice == "4":
                 self.show_config()
-            elif choice == "5":
+            elif choice == "4":
                 self.load_config()
-            elif choice == "6":
+            elif choice == "5":
                 print(success("\nGoodbye! 👋\n"))
                 sys.exit(0)
             else:
@@ -64,11 +62,16 @@ class InteractiveMenu:
         print(header("-" * 60))
         print(colored("1.", Colors.MENU) + " Run Phase 1 (Deadlock-Prone)")
         print(colored("2.", Colors.MENU) + " Run Phase 2 (Deadlock-Free)")
-        print(colored("3.", Colors.MENU) + " Run Both Phases (Comparison)")
-        print(colored("4.", Colors.MENU) + " Show Current Configuration")
-        print(colored("5.", Colors.MENU) + " Load Configuration File")
-        print(colored("6.", Colors.MENU) + " Exit")
+        print(colored("3.", Colors.MENU) + " Show Current Configuration")
+        print(colored("4.", Colors.MENU) + " Load Configuration File")
+        print(colored("5.", Colors.MENU) + " Exit")
         print(header("-" * 60))
+        print(
+            info(
+                "\nNote: Phase 1 will exit the program after detecting deadlock.\n"
+                "      Restart to run Phase 2 or change configuration."
+            )
+        )
 
     def load_config(self) -> None:
         """Load configuration from file."""
@@ -192,27 +195,3 @@ class InteractiveMenu:
 
         except KeyboardInterrupt:
             print(error("\n\n❌ Simulation interrupted by user.\n"))
-
-    def run_both_phases(self) -> None:
-        """Run both phases for comparison."""
-        self.ensure_config_and_logger()
-
-        print(header("\n" + "=" * 60))
-        print(header("RUNNING BOTH PHASES - COMPARISON"))
-        print(header("=" * 60))
-
-        input(colored("\nPress Enter to start Phase 1...", Colors.MENU))
-        self.run_phase1()
-
-        input(colored("\nPress Enter to start Phase 2...", Colors.MENU))
-        self.run_phase2()
-
-        print(header("\n" + "=" * 60))
-        print(header("COMPARISON COMPLETE"))
-        print(header("=" * 60))
-        print(
-            info(
-                "\nPhase 1 should demonstrate deadlock.\n"
-                "Phase 2 should complete successfully.\n"
-            )
-        )
